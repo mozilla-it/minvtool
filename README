@@ -1,0 +1,4 @@
+Create .minvtool.cfg in your home directory  
+[minvtool]  
+hostname = <inventory hostname>  
+token = <api token>  
