@@ -4,6 +4,8 @@ use serde_json::Value;
 use serde_json::to_string;
 use serde_json::from_str;
 use reqwest::StatusCode;
+use std::process::exit;
+use system;
 
 #[allow(dead_code)]
 pub struct InventoryResponse {
@@ -12,6 +14,22 @@ pub struct InventoryResponse {
     pub is_empty: bool,
     pub text: String,
     pub response: Vec<Value>
+}
+
+
+#[allow(dead_code)]
+#[derive(Serialize, Deserialize, Clone)]
+pub struct InventoryError {
+    #[serde(default)]
+    pub non_field_errors: Vec<String>,
+}
+
+impl Default for InventoryError {
+    fn default() -> InventoryError {
+        InventoryError { 
+            non_field_errors: vec![],
+        }
+    }
 }
 
 impl Default for InventoryResponse {
@@ -106,28 +124,42 @@ impl RESTApi {
         None
     }
 
-    pub fn delete(&self, iref: String, token: String) -> Result<Value, String> {
+    pub fn delete(&self, iref: String, system: &system::System, token: &String) -> Option<Value> {
 
         let client = self.get_client();
         let config = self.config.clone();
         let host_path = config.full_path();
-        let full_path = self.get_url(&host_path, &iref);
-        let resp = client.delete(full_path.as_str()).send();
+        let full_path = format!("{}/", self.get_url(&host_path, &iref));
         let resp = client.delete(full_path.as_str()).header("Authorization", format!("Token {}", token)).send();
         match resp {
             Ok(mut _resp) => {
-                Ok(_resp.json().unwrap())
-            }
-            Err(_error) => {
-                return Result::Err("Uknown Error".to_string());
+                match _resp.status(){
+                    StatusCode::OK => { 
+                        println!("Success: Deleted {}", &system.hostname);
+                    },
+                    StatusCode::UNAUTHORIZED => {
+                        println!("Error: Invalid Authentication")
+                    },
+                    StatusCode::NOT_IMPLEMENTED => {
+                        println!("Error: Unimplemented")
+                    },
+                    StatusCode::NOT_FOUND => {
+                        println!("Error: Not Found")
+                    },
+                    s => { println!("Error: Unknown: {}", s) }
+                }
+            },
+            Err(_err) => { 
+                println!("Error: {}", _err);
             }
         }
+        None
     }
 
 
 
 
-    pub fn create(&self, iref: String, post_data: Value, token: &String) -> Option<Vec<Value>> {
+    pub fn create(&self, iref: String, post_data: Value, token: &String) -> Option<reqwest::Response> {
         let client = self.get_client();
         let config = self.config.clone();
         let host_path = config.full_path();
@@ -137,25 +169,23 @@ impl RESTApi {
             Ok(mut _resp) => {
                 match _resp.status(){
                     StatusCode::CREATED => { 
-                        match resp_text_to_vec(_resp) {
-                           Ok(_val) => { return Some(_val) } ,
-                           Err(_) => { () }
-                        }
+                        return Some(_resp)
                     },
                     StatusCode::OK => { 
-                        match resp_text_to_vec(_resp) {
-                           Ok(_val) => { return Some(_val) } ,
-                           Err(_) => { () }
-                        }
+                        return Some(_resp)
                     },
                     StatusCode::UNAUTHORIZED => {
                         println!("Invalid Authentication.");
                     },
                     StatusCode::BAD_REQUEST => { 
-                        println!("{:?}", &_resp.status());
-                        let foo = &_resp.text().unwrap();
+                        //let foo = serde_json::from_str(&_resp.text().unwrap());
+                        let errors: InventoryError = serde_json::from_str(&_resp.text().unwrap()).unwrap();
 
-                        println!("{:?}", &foo);
+                        for error in errors.non_field_errors {
+                            println!("Error: {}", error);
+                            exit(2);
+                        }
+                        
                     },
                     StatusCode::INTERNAL_SERVER_ERROR => { 
                         println!("{:?}", &_resp.text().unwrap());

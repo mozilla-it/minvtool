@@ -3,12 +3,18 @@ use serde_json::Value;
 use inventory_api::InventoryResponse;
 use inventory_api::RESTApi;
 use minv_config;
+
 #[derive(Deserialize,Serialize)]
 #[allow(dead_code)]
 #[derive(Clone)]
-struct System {
+pub struct System {
     id: u32,
-    hostname: String,
+    pub hostname: String,
+    serial: String,
+    #[serde(default)]
+    server_model_id: String,
+    #[serde(default)]
+    server_model_name: String,
 }
 
 impl std::fmt::Display for System {
@@ -22,6 +28,9 @@ impl Default for System {
         System { 
             id: 0,
             hostname: String::new(),
+            serial: String::new(),
+            server_model_id: String::new(),
+            server_model_name: String::new(),
         }
     }
 }
@@ -37,6 +46,17 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
             None => println!("Hostname Required")
         }
     }
+    if let Some(_get_matches) = host_matches.subcommand_matches("delete") {
+        let hostname="";
+        let mut s = System{ ..Default::default() };
+        match _get_matches.value_of("hostname"){
+            Some(_value) => { 
+                s.hostname = _value.to_string();
+                delete_system(s, config.clone());
+            },
+            None => println!("Hostname Required")
+        }
+    }
     if let Some(_get_matches) = host_matches.subcommand_matches("create") {
         let hostname="";
         let mut s = System{ ..Default::default() };
@@ -45,6 +65,30 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
                 s.hostname = _value.to_string();
             },
             None => println!("Hostname Required")
+        }
+        match _get_matches.value_of("serial"){
+            Some(_value) => { 
+                s.serial = _value.to_string();
+            },
+            None => { 
+                // Possibly check here for error?
+            }
+        }
+        match _get_matches.value_of("server-model-id"){
+            Some(_value) => { 
+                s.server_model_id = _value.to_string();
+            },
+            None => { 
+                // Possibly check here for error?
+            }
+        }
+        match _get_matches.value_of("server-model-name"){
+            Some(_value) => { 
+                s.server_model_name = _value.to_string();
+            },
+            None => { 
+                // Possibly check here for error?
+            }
         }
         create_system(s, config.clone());
     }
@@ -75,12 +119,36 @@ fn create_system(system: System, config: minv_config::Config) {
     };
     let json_data = serde_json::to_value(&system).unwrap();
     match r.create(ENDPOINT.to_string(), json_data, &r.config.token) {
-        Some(value) => {
-            println!("{:?} YAY", value);
-            //let s: System = serde_json::from_value(value).unwrap();
-            //println!("{}", s)
+        Some(mut _value) => {
+            let s: System = _value.json().unwrap();
+            println!("{}", s);
         },
-        None => { println!("No Results") }
+        None => {}
+    }
+    
+    /*
+
+    if api_out.count == 0 {
+        println!("Error: {} not found.", search);
+    } else {
+        let entries = serialize_entries(api_out.response);
+        for entry in entries {
+            println!("{}", entry);
+        }
+    }
+    */
+}
+fn delete_system(system: System, config: minv_config::Config) {
+    let r = RESTApi {
+        config: config
+    };
+    let json_data = serde_json::to_value(&system).unwrap();
+    let url = format!("{}/{}", ENDPOINT, system.hostname);
+    match r.delete(url, &system, &r.config.token) {
+        Some(mut _value) => {
+            println!("{} deleted", &system.hostname);
+        },
+        None => {}
     }
     
     /*
