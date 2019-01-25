@@ -15,6 +15,8 @@ pub struct System {
     server_model_id: String,
     #[serde(default)]
     server_model_name: String,
+    #[serde(default)]
+    asset_tag: String,
 }
 
 impl std::fmt::Display for System {
@@ -29,6 +31,7 @@ impl Default for System {
             id: 0,
             hostname: String::new(),
             serial: String::new(),
+            asset_tag: String::new(),
             server_model_id: String::new(),
             server_model_name: String::new(),
         }
@@ -71,6 +74,14 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
                 s.serial = _value.to_string();
             },
             None => { 
+                // Possibly check here for error?
+            }
+        }
+        match _get_matches.value_of("asset-tag"){
+            Some(_value) => {
+                s.asset_tag = _value.to_string();
+            },
+            None => {
                 // Possibly check here for error?
             }
         }

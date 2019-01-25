@@ -58,6 +58,12 @@ fn main() {
                     .help("System serial number")
                     .takes_value(true)
                 )
+                .arg(Arg::with_name("asset-tag")
+                    .required(false)
+                    .long("asset-tag")
+                    .help("System Asset Tag")
+                    .takes_value(true)
+                )
             )
             
         )
