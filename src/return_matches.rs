@@ -5,7 +5,7 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
         .version("0.0.1")
         .author("Rob Tucker <rtucker@mozilla.com>")
         .subcommand(SubCommand::with_name("system")
-            .about("Intefaces with System Objects")
+            .about("Interfaces with System Objects")
             .subcommand(SubCommand::with_name("get")
                 .about("Get System")
                 .arg(Arg::with_name("hostname")
