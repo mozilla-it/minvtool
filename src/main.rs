@@ -4,7 +4,6 @@ extern crate reqwest;
 extern crate serde;
 extern crate serde_json;
 
-#[macro_use]
 extern crate clap;
 
 #[macro_use]
@@ -13,7 +12,7 @@ extern crate serde_derive;
 mod system;
 mod minv_config;
 mod inventory_api;
-use clap::{App, Arg, SubCommand, AppSettings};
+use clap::{App, Arg, SubCommand};
 
 
 fn main() {
@@ -26,7 +25,7 @@ fn main() {
         .version("0.0.1")
         .author("Rob Tucker <rtucker@mozilla.com>")
         .subcommand(SubCommand::with_name("system")
-            .about("Interaces with System Objects")
+            .about("Intefaces with System Objects")
             .subcommand(SubCommand::with_name("get")
                 .about("Get System")
                 .arg(Arg::with_name("hostname")
@@ -39,6 +38,19 @@ fn main() {
                 .arg(Arg::with_name("hostname")
                     .required(true)
                     .help("Hostname of System to be created")
+                )
+            )
+            .subcommand(SubCommand::with_name("update")
+                .about("Updates System Objects")
+                .arg(Arg::with_name("hostname")
+                    .required(true)
+                    .help("Hostname of System to be created")
+                )
+                .arg(Arg::with_name("serial")
+                    .required(false)
+                    .long("serial")
+                    .help("System serial number")
+                    .takes_value(true)
                 )
             )
             .subcommand(SubCommand::with_name("create")

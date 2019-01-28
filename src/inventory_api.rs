@@ -52,16 +52,6 @@ pub struct RESTResponse {
     pub text: String,
 }
 
-fn resp_text_to_vec(mut i_resp: reqwest::Response) -> Result<Vec<Value>, reqwest::Error> {
-    match i_resp.text() {
-        Ok(_str) => { 
-            let retval = from_str(&_str).unwrap();
-            Ok(vec![retval])
-        },
-        Err(_err) => { Err(_err) }
-    }
-}
-
 #[allow(dead_code)]
 fn format_error(mut _resp: reqwest::Response) -> String {
     let error_text = _resp.text().unwrap();
@@ -76,12 +66,6 @@ pub struct RESTApi {
     pub config: minv_config::Config
 }
 
-pub struct InventoryResult {
-    pub count: String,
-    pub next: String,
-    pub previous: String,
-    pub results: Vec<String>,
-}
 
 impl RESTApi {
 
@@ -165,6 +149,47 @@ impl RESTApi {
         let host_path = config.full_path();
         let full_path = format!("{}/", self.get_url(&host_path, &iref));
         let resp = client.post(full_path.as_str()).header("Content-Type", "application/json").header("Authorization", format!("Token {}", token)).json(&post_data).send();
+        match resp {
+            Ok(mut _resp) => {
+                match _resp.status(){
+                    StatusCode::CREATED => { 
+                        return Some(_resp)
+                    },
+                    StatusCode::OK => { 
+                        return Some(_resp)
+                    },
+                    StatusCode::UNAUTHORIZED => {
+                        println!("Invalid Authentication.");
+                    },
+                    StatusCode::BAD_REQUEST => { 
+                        //let foo = serde_json::from_str(&_resp.text().unwrap());
+                        let errors: InventoryError = serde_json::from_str(&_resp.text().unwrap()).unwrap();
+
+                        for error in errors.non_field_errors {
+                            println!("Error: {}", error);
+                            exit(2);
+                        }
+                        
+                    },
+                    StatusCode::INTERNAL_SERVER_ERROR => { 
+                        println!("{:?}", &_resp.text().unwrap());
+                        println!("Internal Server Error");
+                    },
+                    s => { println!("Unknown Response: {}", s)}
+                }
+            },
+            Err(_err) => { 
+                println!("{}", _err);
+            }
+        }
+        None
+    }
+    pub fn update(&self, iref: String, post_data: Value, token: &String) -> Option<reqwest::Response> {
+        let client = self.get_client();
+        let config = self.config.clone();
+        let host_path = config.full_path();
+        let full_path = format!("{}/", self.get_url(&host_path, &iref));
+        let resp = client.patch(full_path.as_str()).header("Content-Type", "application/json").header("Authorization", format!("Token {}", token)).json(&post_data).send();
         match resp {
             Ok(mut _resp) => {
                 match _resp.status(){

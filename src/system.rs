@@ -1,12 +1,9 @@
 use serde_json;
-use serde_json::Value;
-use inventory_api::InventoryResponse;
 use inventory_api::RESTApi;
 use minv_config;
 
-#[derive(Deserialize,Serialize)]
+#[derive(Deserialize,Serialize,Clone)]
 #[allow(dead_code)]
-#[derive(Clone)]
 pub struct System {
     id: u32,
     pub hostname: String,
@@ -44,13 +41,12 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
         match _get_matches.value_of("hostname"){
             Some(value) => { 
                 let hostname_search = &format!("{}/{}", ENDPOINT, value);
-                get_system(&hostname_search, config.clone());
+                get_system(&hostname_search, false, config.clone());
             },
             None => println!("Hostname Required")
         }
     }
     if let Some(_get_matches) = host_matches.subcommand_matches("delete") {
-        let hostname="";
         let mut s = System{ ..Default::default() };
         match _get_matches.value_of("hostname"){
             Some(_value) => { 
@@ -60,8 +56,30 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
             None => println!("Hostname Required")
         }
     }
+    if let Some(_get_matches) = host_matches.subcommand_matches("update") {
+        match _get_matches.value_of("hostname"){
+            Some(_value) => { 
+                let hostname_search = &format!("{}/{}", ENDPOINT, _value);
+                match get_system(&hostname_search, true, config.clone()) {
+                    Some(mut _s) => { 
+                        match _get_matches.value_of("serial"){
+                            Some(_value) => { 
+                                _s.serial = _value.to_string();
+                            },
+                            None => { 
+                                // Possibly check here for error?
+                            }
+                        }
+                        update_system(_s, config.clone());
+                    },
+                    None => { println!("No System Found")}
+                }
+                },
+            None => println!("Hostname Required")
+        }
+
+    }
     if let Some(_get_matches) = host_matches.subcommand_matches("create") {
-        let hostname="";
         let mut s = System{ ..Default::default() };
         match _get_matches.value_of("hostname"){
             Some(_value) => { 
@@ -105,7 +123,7 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
     }
 }
 
-fn get_system(search: &str, config: minv_config::Config) {
+fn get_system(search: &str, should_return: bool, config: minv_config::Config) -> Option<System> {
     let token = config.clone().token;
     let r = RESTApi {
         config: config
@@ -115,13 +133,31 @@ fn get_system(search: &str, config: minv_config::Config) {
             match serde_json::from_value(value) {
                 Ok(_value) => {
                     let s: System = _value;
-                    println!("{}", s)
-
+                    if should_return {
+                        return Some(s);
+                    } else {
+                        println!("{}", s)
+                    }
                 },
                 Err(_e) => { println!("No Results")}
             }
         },
         None => { println!("No Results") }
+    }
+    None
+}
+fn update_system(system: System, config: minv_config::Config) {
+    let r = RESTApi {
+        config: config
+    };
+    let json_data = serde_json::to_value(&system).unwrap();
+    let url = format!("{}/{}", ENDPOINT, system.hostname);
+    match r.update(url, json_data, &r.config.token) {
+        Some(mut _value) => {
+            let s: System = _value.json().unwrap();
+            println!("{}", s);
+        },
+        None => {}
     }
 }
 fn create_system(system: System, config: minv_config::Config) {
@@ -136,24 +172,11 @@ fn create_system(system: System, config: minv_config::Config) {
         },
         None => {}
     }
-    
-    /*
-
-    if api_out.count == 0 {
-        println!("Error: {} not found.", search);
-    } else {
-        let entries = serialize_entries(api_out.response);
-        for entry in entries {
-            println!("{}", entry);
-        }
-    }
-    */
 }
 fn delete_system(system: System, config: minv_config::Config) {
     let r = RESTApi {
         config: config
     };
-    let json_data = serde_json::to_value(&system).unwrap();
     let url = format!("{}/{}", ENDPOINT, system.hostname);
     match r.delete(url, &system, &r.config.token) {
         Some(mut _value) => {
@@ -174,6 +197,8 @@ fn delete_system(system: System, config: minv_config::Config) {
     }
     */
 }
+/*
+will need this for search implementation down the road
 fn serialize_entries(entries: Vec<Value>) -> Vec<System> {
     let entries: Vec<Value> = entries;
     let mut return_systems = vec![];
@@ -184,3 +209,4 @@ fn serialize_entries(entries: Vec<Value>) -> Vec<System> {
     return_systems
 
 }
+*/
