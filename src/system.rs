@@ -16,6 +16,8 @@ pub struct System {
     asset_tag: String,
     #[serde(default)]
     switch_ports: Option<String>,
+    #[serde(default)]
+    oob_ip: Option<String>,
 }
 
 impl std::fmt::Display for System {
@@ -32,12 +34,64 @@ impl Default for System {
             serial: String::new(),
             asset_tag: String::new(),
             switch_ports: Some(String::new()),
+            oob_ip: Some(String::new()),
             server_model_id: String::new(),
             server_model_name: String::new(),
         }
     }
 }
 
+fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> System {
+    match _get_matches.value_of("serial"){
+        Some(_value) => { 
+            system.serial = _value.to_string();
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("asset-tag"){
+        Some(_value) => {
+            system.asset_tag = _value.to_string();
+        },
+        None => {
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("switch-ports"){
+        Some(_value) => {
+            system.switch_ports = Some(_value.to_string());
+        },
+        None => {
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("oob-ip"){
+        Some(_value) => {
+            system.oob_ip = Some(_value.to_string());
+        },
+        None => {
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("server-model-id"){
+        Some(_value) => { 
+            system.server_model_id = _value.to_string();
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("server-model-name"){
+        Some(_value) => { 
+            system.server_model_name = _value.to_string();
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    system
+}
 const ENDPOINT: &'static str = "systems";
 pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
     if let Some(_get_matches) = host_matches.subcommand_matches("get") {
@@ -65,30 +119,7 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
                 let hostname_search = &format!("{}/{}", ENDPOINT, _value);
                 match get_system(&hostname_search, true, config.clone()) {
                     Some(mut _s) => { 
-                        match _get_matches.value_of("serial"){
-                            Some(_value) => { 
-                                _s.serial = _value.to_string();
-                            },
-                            None => { 
-                                // Possibly check here for error?
-                            }
-                        }
-                        match _get_matches.value_of("asset-tag"){
-                            Some(_value) => {
-                                _s.asset_tag = _value.to_string();
-                            },
-                            None => {
-                                // Possibly check here for error?
-                            }
-                        }
-                        match _get_matches.value_of("switch-ports"){
-                            Some(_value) => {
-                                _s.switch_ports = Some(_value.to_string());
-                            },
-                            None => {
-                                // Possibly check here for error?
-                            }
-                        }
+                        _s = system_from_matches(_get_matches, _s);
                         update_system(_s, config.clone());
                     },
                     None => { println!("No System Found")}
@@ -106,46 +137,7 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
             },
             None => println!("Hostname Required")
         }
-        match _get_matches.value_of("serial"){
-            Some(_value) => { 
-                s.serial = _value.to_string();
-            },
-            None => { 
-                // Possibly check here for error?
-            }
-        }
-        match _get_matches.value_of("asset-tag"){
-            Some(_value) => {
-                s.asset_tag = _value.to_string();
-            },
-            None => {
-                // Possibly check here for error?
-            }
-        }
-        match _get_matches.value_of("switch-ports"){
-            Some(_value) => {
-                s.switch_ports = Some(_value.to_string());
-            },
-            None => {
-                // Possibly check here for error?
-            }
-        }
-        match _get_matches.value_of("server-model-id"){
-            Some(_value) => { 
-                s.server_model_id = _value.to_string();
-            },
-            None => { 
-                // Possibly check here for error?
-            }
-        }
-        match _get_matches.value_of("server-model-name"){
-            Some(_value) => { 
-                s.server_model_name = _value.to_string();
-            },
-            None => { 
-                // Possibly check here for error?
-            }
-        }
+        s = system_from_matches(_get_matches, s);
         create_system(s, config.clone());
     }
 }
