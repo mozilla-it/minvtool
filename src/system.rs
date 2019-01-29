@@ -14,6 +14,8 @@ pub struct System {
     server_model_name: String,
     #[serde(default)]
     asset_tag: String,
+    #[serde(default)]
+    switch_ports: Option<String>,
 }
 
 impl std::fmt::Display for System {
@@ -29,6 +31,7 @@ impl Default for System {
             hostname: String::new(),
             serial: String::new(),
             asset_tag: String::new(),
+            switch_ports: Some(String::new()),
             server_model_id: String::new(),
             server_model_name: String::new(),
         }
@@ -70,6 +73,22 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
                                 // Possibly check here for error?
                             }
                         }
+                        match _get_matches.value_of("asset-tag"){
+                            Some(_value) => {
+                                _s.asset_tag = _value.to_string();
+                            },
+                            None => {
+                                // Possibly check here for error?
+                            }
+                        }
+                        match _get_matches.value_of("switch-ports"){
+                            Some(_value) => {
+                                _s.switch_ports = Some(_value.to_string());
+                            },
+                            None => {
+                                // Possibly check here for error?
+                            }
+                        }
                         update_system(_s, config.clone());
                     },
                     None => { println!("No System Found")}
@@ -103,6 +122,14 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
                 // Possibly check here for error?
             }
         }
+        match _get_matches.value_of("switch-ports"){
+            Some(_value) => {
+                s.switch_ports = Some(_value.to_string());
+            },
+            None => {
+                // Possibly check here for error?
+            }
+        }
         match _get_matches.value_of("server-model-id"){
             Some(_value) => { 
                 s.server_model_id = _value.to_string();
@@ -130,6 +157,7 @@ fn get_system(search: &str, should_return: bool, config: minv_config::Config) ->
     };
     match r.get(search.to_string(), token) {
         Some(value) => {
+            println!("{}", &value);
             match serde_json::from_value(value) {
                 Ok(_value) => {
                     let s: System = _value;

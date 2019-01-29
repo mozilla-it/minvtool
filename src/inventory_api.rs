@@ -162,7 +162,6 @@ impl RESTApi {
                         println!("Invalid Authentication.");
                     },
                     StatusCode::BAD_REQUEST => { 
-                        //let foo = serde_json::from_str(&_resp.text().unwrap());
                         let errors: InventoryError = serde_json::from_str(&_resp.text().unwrap()).unwrap();
 
                         for error in errors.non_field_errors {
@@ -203,7 +202,6 @@ impl RESTApi {
                         println!("Invalid Authentication.");
                     },
                     StatusCode::BAD_REQUEST => { 
-                        //let foo = serde_json::from_str(&_resp.text().unwrap());
                         let errors: InventoryError = serde_json::from_str(&_resp.text().unwrap()).unwrap();
 
                         for error in errors.non_field_errors {

@@ -55,28 +55,3 @@ pub fn get_config(path: PathBuf) -> Config {
     };
     return config;
 }
-
-#[test]
-fn test_full_path() {
-    let config = Config{
-        token: "password".to_string(),
-        hostname: "https://localhost/".to_string(),
-    };
-    assert_eq!(config.full_path(), format!("https://localhost/wapi/v{}", VERSION));
-}
-#[test]
-fn test_full_path_hostname_not_having_trailing_slash() {
-    let config = Config{
-        username: "username".to_string(),
-        password: "password".to_string(),
-        host: "https://localhost".to_string(),
-    };
-    assert_eq!(config.full_path(), format!("https://localhost/wapi/v{}", VERSION));
-}
-/*
-#[test]
-fn test_Config_struct_empty() {
-    let foo = Config{};;
-    assert_eq!(foo.username, "");
-}
-*/
