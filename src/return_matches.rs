@@ -21,6 +21,11 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
             .long("oob-ip")
             .help("System oob-ip")
             .takes_value(true),
+        Arg::with_name("patch-panel-port")
+            .required(false)
+            .long("patch-panel-port")
+            .help("System patch-panel-port")
+            .takes_value(true),
         Arg::with_name("server-model-id")
             .required(false)
             .long("server-model-id")

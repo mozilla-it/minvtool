@@ -18,6 +18,8 @@ pub struct System {
     switch_ports: Option<String>,
     #[serde(default)]
     oob_ip: Option<String>,
+    #[serde(default)]
+    patch_panel_port: Option<String>,
 }
 
 impl std::fmt::Display for System {
@@ -35,6 +37,7 @@ impl Default for System {
             asset_tag: String::new(),
             switch_ports: Some(String::new()),
             oob_ip: Some(String::new()),
+            patch_panel_port: Some(String::new()),
             server_model_id: String::new(),
             server_model_name: String::new(),
         }
@@ -69,6 +72,14 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
     match _get_matches.value_of("oob-ip"){
         Some(_value) => {
             system.oob_ip = Some(_value.to_string());
+        },
+        None => {
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("patch-panel-port"){
+        Some(_value) => {
+            system.patch_panel_port = Some(_value.to_string());
         },
         None => {
             // Possibly check here for error?
