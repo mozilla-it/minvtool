@@ -26,15 +26,10 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
             .long("patch-panel-port")
             .help("System patch-panel-port")
             .takes_value(true),
-        Arg::with_name("server-model-id")
+        Arg::with_name("server-model")
             .required(false)
-            .long("server-model-id")
+            .long("server-model")
             .help("ID of server-model")
-            .takes_value(true),
-        Arg::with_name("server-model-name")
-            .required(false)
-            .long("server-model-name")
-            .help("Name of server-model")
             .takes_value(true),
     );
         let matches = App::new("minvtool")

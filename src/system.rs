@@ -9,7 +9,7 @@ pub struct System {
     pub hostname: String,
     serial: String,
     #[serde(default)]
-    server_model_id: String,
+    server_model: u32,
     #[serde(default)]
     server_model_name: String,
     #[serde(default)]
@@ -38,7 +38,7 @@ impl Default for System {
             switch_ports: Some(String::new()),
             oob_ip: Some(String::new()),
             patch_panel_port: Some(String::new()),
-            server_model_id: String::new(),
+            server_model: 0,
             server_model_name: String::new(),
         }
     }
@@ -85,9 +85,9 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
             // Possibly check here for error?
         }
     }
-    match _get_matches.value_of("server-model-id"){
+    match _get_matches.value_of("server-model"){
         Some(_value) => { 
-            system.server_model_id = _value.to_string();
+            system.server_model = _value.parse::<u32>().unwrap();
         },
         None => { 
             // Possibly check here for error?
