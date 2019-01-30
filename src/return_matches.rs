@@ -1,6 +1,6 @@
 use clap::{App, Arg, SubCommand, ArgMatches};
 pub fn return_matches<'a>() -> ArgMatches<'static> {
-    let shared_args = vec!(
+    let system_shared_args = vec!(
         Arg::with_name("serial")
             .required(false)
             .long("serial")
@@ -71,6 +71,16 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
         .about("CLI interface to Mozilla Inventory")
         .version("0.0.1")
         .author("Rob Tucker <rtucker@mozilla.com>")
+        .subcommand(SubCommand::with_name("servermodel")
+            .about("Interfaces with ServerModel Objects")
+            .subcommand(SubCommand::with_name("search")
+                .about("Search ServerModel")
+                .arg(Arg::with_name("search")
+                    .required(true)
+                    .help("Hostname of System to be retrieved")
+                )
+            )
+        )
         .subcommand(SubCommand::with_name("system")
             .about("Interfaces with System Objects")
             .subcommand(SubCommand::with_name("get")
@@ -93,7 +103,7 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
                     .required(true)
                     .help("Hostname of System to be updated")
                 )
-                .args(&shared_args)
+                .args(&system_shared_args)
             )
             .subcommand(SubCommand::with_name("create")
                 .about("Creates System Objects")
@@ -101,7 +111,7 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
                     .required(true)
                     .help("Hostname of System to be created")
                 )
-                .args(&shared_args)
+                .args(&system_shared_args)
             )
             
         )

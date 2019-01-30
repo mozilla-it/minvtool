@@ -236,7 +236,8 @@ fn get_system(search: &str, should_return: bool, config: minv_config::Config) ->
     let r = RESTApi {
         config: config
     };
-    match r.get(search.to_string(), token) {
+    let final_search = format!("{}/", search);
+    match r.get(final_search.to_string(), token) {
         Some(value) => {
             println!("{}", &value);
             match serde_json::from_value(value) {

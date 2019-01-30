@@ -83,7 +83,7 @@ impl RESTApi {
         let client = self.get_client();
         let config = self.config.clone();
         let host_path = config.full_path();
-        let full_path = format!("{}/", self.get_url(&host_path, &iref));
+        let full_path = format!("{}", self.get_url(&host_path, &iref));
         let resp = client.get(full_path.as_str()).header("Authorization", format!("Token {}", token)).send();
         match resp {
             Ok(mut _resp) => {

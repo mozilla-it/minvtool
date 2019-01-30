@@ -9,6 +9,7 @@ extern crate clap;
 extern crate serde_derive;
 
 mod system;
+mod servermodel;
 mod minv_config;
 mod inventory_api;
 mod return_matches;
@@ -20,6 +21,10 @@ fn main() {
     let matches = return_matches::return_matches();
     match matches.subcommand_matches("system") {
         Some(value) => { system::execute(value, config.clone()) },
+        None => {}
+    }
+    match matches.subcommand_matches("servermodel") {
+        Some(value) => { servermodel::execute(value, config.clone()) },
         None => {}
     }
 }
