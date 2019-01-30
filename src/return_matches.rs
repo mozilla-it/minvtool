@@ -21,6 +21,11 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
             .long("oob-ip")
             .help("System oob-ip")
             .takes_value(true),
+        Arg::with_name("oob-switch-port")
+            .required(false)
+            .long("oob-switch-port")
+            .help("System oob-switch-port")
+            .takes_value(true),
         Arg::with_name("patch-panel-port")
             .required(false)
             .long("patch-panel-port")
@@ -30,6 +35,36 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
             .required(false)
             .long("server-model")
             .help("ID of server-model")
+            .takes_value(true),
+        Arg::with_name("system-status")
+            .required(false)
+            .long("system-status")
+            .help("ID of system-status")
+            .takes_value(true),
+        Arg::with_name("system-type")
+            .required(false)
+            .long("system-type")
+            .help("ID of system-type")
+            .takes_value(true),
+        Arg::with_name("system-rack")
+            .required(false)
+            .long("system-rack")
+            .help("ID of system-rack")
+            .takes_value(true),
+        Arg::with_name("rack-order")
+            .required(false)
+            .long("rack-order")
+            .help("rack order from bottom of rack")
+            .takes_value(true),
+        Arg::with_name("operating-system")
+            .required(false)
+            .long("operating-system")
+            .help("ID of operating-system")
+            .takes_value(true),
+        Arg::with_name("allocation")
+            .required(false)
+            .long("allocation")
+            .help("ID of allocation")
             .takes_value(true),
     );
         let matches = App::new("minvtool")

@@ -19,7 +19,21 @@ pub struct System {
     #[serde(default)]
     oob_ip: Option<String>,
     #[serde(default)]
+    oob_switch_port: Option<String>,
+    #[serde(default)]
     patch_panel_port: Option<String>,
+    #[serde(default)]
+    system_status: Option<u32>,
+    #[serde(default)]
+    system_type: Option<u32>,
+    #[serde(default)]
+    system_rack: Option<u32>,
+    #[serde(default)]
+    rack_order: Option<String>,
+    #[serde(default)]
+    allocation: Option<u32>,
+    #[serde(default)]
+    operating_system: Option<u32>,
 }
 
 impl std::fmt::Display for System {
@@ -37,8 +51,15 @@ impl Default for System {
             asset_tag: String::new(),
             switch_ports: Some(String::new()),
             oob_ip: Some(String::new()),
+            oob_switch_port: Some(String::new()),
             patch_panel_port: Some(String::new()),
             server_model: 0,
+            system_status: Some(0),
+            system_type: Some(0),
+            system_rack: Some(0),
+            rack_order: Some(String::new()),
+            allocation: Some(0),
+            operating_system: Some(0),
             server_model_name: String::new(),
         }
     }
@@ -77,6 +98,14 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
             // Possibly check here for error?
         }
     }
+    match _get_matches.value_of("oob-switch-port"){
+        Some(_value) => {
+            system.oob_switch_port = Some(_value.to_string());
+        },
+        None => {
+            // Possibly check here for error?
+        }
+    }
     match _get_matches.value_of("patch-panel-port"){
         Some(_value) => {
             system.patch_panel_port = Some(_value.to_string());
@@ -88,6 +117,55 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
     match _get_matches.value_of("server-model"){
         Some(_value) => { 
             system.server_model = _value.parse::<u32>().unwrap();
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("system-status"){
+        Some(_value) => { 
+            system.system_status = Some(_value.parse::<u32>().unwrap());
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("allocation"){
+        Some(_value) => { 
+            system.allocation = Some(_value.parse::<u32>().unwrap());
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("operating-system"){
+        Some(_value) => { 
+            system.operating_system = Some(_value.parse::<u32>().unwrap());
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("system-type"){
+        Some(_value) => { 
+            system.system_type = Some(_value.parse::<u32>().unwrap());
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("system-rack"){
+        Some(_value) => { 
+            system.system_rack = Some(_value.parse::<u32>().unwrap());
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("rack-order"){
+        Some(_value) => { 
+            // system.rack_order = Some(_value.parse::<f32>().unwrap());
+            system.rack_order = Some(_value.to_string());
         },
         None => { 
             // Possibly check here for error?
