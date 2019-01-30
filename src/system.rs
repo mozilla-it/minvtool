@@ -293,18 +293,6 @@ fn delete_system(system: System, config: minv_config::Config) {
         },
         None => {}
     }
-    
-    /*
-
-    if api_out.count == 0 {
-        println!("Error: {} not found.", search);
-    } else {
-        let entries = serialize_entries(api_out.response);
-        for entry in entries {
-            println!("{}", entry);
-        }
-    }
-    */
 }
 /*
 will need this for search implementation down the road
