@@ -38,7 +38,7 @@ pub struct System {
 
 impl std::fmt::Display for System {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "id={} hostname={}", self.id, self.hostname)
+        write!(f, "id={} hostname={} serial={} asset_tag={}", self.id, self.hostname, self.serial, self.asset_tag)
     }
 }
 
@@ -239,7 +239,6 @@ fn get_system(search: &str, should_return: bool, config: minv_config::Config) ->
     let final_search = format!("{}/", search);
     match r.get(final_search.to_string(), token) {
         Some(value) => {
-            println!("{}", &value);
             match serde_json::from_value(value) {
                 Ok(_value) => {
                     let s: System = _value;
