@@ -12,6 +12,7 @@ mod system;
 mod servermodel;
 mod operatingsystem;
 mod systemtype;
+mod systemrack;
 mod minv_config;
 mod inventory_api;
 mod return_matches;
@@ -35,6 +36,10 @@ fn main() {
     }
     match matches.subcommand_matches("systemtype") {
         Some(value) => { systemtype::execute(value, config.clone()) },
+        None => {}
+    }
+    match matches.subcommand_matches("systemrack") {
+        Some(value) => { systemrack::execute(value, config.clone()) },
         None => {}
     }
 }
