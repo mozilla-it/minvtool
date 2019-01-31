@@ -4,40 +4,37 @@ use minv_config;
 
 #[derive(Deserialize,Serialize,Clone)]
 #[allow(dead_code)]
-pub struct OperatingSystem {
+pub struct SystemType {
     id: u32,
     #[serde(default)]
-    name: String,
-    #[serde(default)]
-    version: String,
+    type_name: String,
 }
 
-impl std::fmt::Display for OperatingSystem {
+impl std::fmt::Display for SystemType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "id={} name={} version={}", self.id, self.name, self.version)
+        write!(f, "id={} name={}", self.id, self.type_name)
     }
 }
 
-impl Default for OperatingSystem {
-    fn default() -> OperatingSystem {
-        OperatingSystem { 
+impl Default for SystemType {
+    fn default() -> SystemType {
+        SystemType { 
             id: 0,
-            name: String::new(),
-            version: String::new(),
+            type_name: String::new(),
         }
     }
 }
 
 #[derive(Deserialize,Serialize,Clone)]
 #[allow(dead_code)]
-pub struct OperatingSystemSearchResponse {
+pub struct SystemTypeSearchResponse {
     pub count: usize,
     pub previous: Option<String>,
     pub next: Option<String>,
-    pub results: Vec<OperatingSystem>
+    pub results: Vec<SystemType>
 }
 
-const ENDPOINT: &'static str = "operatingsystem";
+const ENDPOINT: &'static str = "systemtype";
 pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
     if let Some(_get_matches) = host_matches.subcommand_matches("search") {
         match _get_matches.value_of("search"){
@@ -54,7 +51,7 @@ pub fn execute(host_matches: &clap::ArgMatches, config: minv_config::Config){
     }
 }
 
-fn search(search: &str, config: minv_config::Config) -> Option<OperatingSystem> {
+fn search(search: &str, config: minv_config::Config) -> Option<SystemType> {
     let token = config.clone().token;
     let r = RESTApi {
         config: config
@@ -63,7 +60,7 @@ fn search(search: &str, config: minv_config::Config) -> Option<OperatingSystem> 
         Some(value) => {
             match serde_json::from_value(value) {
                 Ok(_value) => {
-                    let s: OperatingSystemSearchResponse = _value;
+                    let s: SystemTypeSearchResponse = _value;
                     if s.results.len() > 0 {
                         for sm in s.results {
                             println!("{}", sm);
@@ -75,20 +72,7 @@ fn search(search: &str, config: minv_config::Config) -> Option<OperatingSystem> 
                 Err(_e) => { println!("No Results")}
             }
         },
-        None => { println!("No Results") }
+        None => { println!("No Resuls") }
     }
     None
 }
-/*
-will need this for search implementation down the road
-fn serialize_entries(entries: Vec<Value>) -> Vec<System> {
-    let entries: Vec<Value> = entries;
-    let mut return_systems = vec![];
-    for entry in entries {
-        let system: System = serde_json::from_value(entry).unwrap();
-        return_systems.push(system);
-    }
-    return_systems
-
-}
-*/

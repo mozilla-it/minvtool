@@ -11,6 +11,7 @@ extern crate serde_derive;
 mod system;
 mod servermodel;
 mod operatingsystem;
+mod systemtype;
 mod minv_config;
 mod inventory_api;
 mod return_matches;
@@ -30,6 +31,10 @@ fn main() {
     }
     match matches.subcommand_matches("operatingsystem") {
         Some(value) => { operatingsystem::execute(value, config.clone()) },
+        None => {}
+    }
+    match matches.subcommand_matches("systemtype") {
+        Some(value) => { systemtype::execute(value, config.clone()) },
         None => {}
     }
 }
