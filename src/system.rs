@@ -7,13 +7,12 @@ use minv_config;
 pub struct System {
     id: u32,
     pub hostname: String,
-    serial: String,
     #[serde(default)]
-    server_model: u32,
+    serial: Option<String>,
     #[serde(default)]
-    server_model_name: String,
+    server_model: String,
     #[serde(default)]
-    asset_tag: String,
+    pub asset_tag: Option<String>,
     #[serde(default)]
     switch_ports: Option<String>,
     #[serde(default)]
@@ -23,22 +22,27 @@ pub struct System {
     #[serde(default)]
     patch_panel_port: Option<String>,
     #[serde(default)]
-    system_status: Option<u32>,
+    system_status: Option<String>,
     #[serde(default)]
-    system_type: Option<u32>,
+    system_type: Option<String>,
     #[serde(default)]
-    system_rack: Option<u32>,
+    system_rack: Option<String>,
     #[serde(default)]
-    rack_order: Option<String>,
+    pub rack_order: Option<String>,
     #[serde(default)]
-    allocation: Option<u32>,
+    operating_system: Option<String>,
     #[serde(default)]
-    operating_system: Option<u32>,
+    notes: Option<String>,
+    #[serde(default)]
+    warranty_start: Option<String>,
+    #[serde(default)]
+    warranty_end: Option<String>,
 }
 
 impl std::fmt::Display for System {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "id={} hostname={} serial={} asset_tag={}", self.id, self.hostname, self.serial, self.asset_tag)
+        let tmp = self.clone();
+        write!(f, "id={} hostname={} serial={} asset_tag={}", tmp.id, tmp.hostname, tmp.serial.unwrap_or_default(), tmp.asset_tag.unwrap_or_default())
     }
 }
 
@@ -47,20 +51,21 @@ impl Default for System {
         System { 
             id: 0,
             hostname: String::new(),
-            serial: String::new(),
-            asset_tag: String::new(),
+            serial: Some(String::new()),
+            asset_tag: Some(String::new()),
             switch_ports: Some(String::new()),
             oob_ip: Some(String::new()),
             oob_switch_port: Some(String::new()),
             patch_panel_port: Some(String::new()),
-            server_model: 0,
-            system_status: Some(0),
-            system_type: Some(0),
-            system_rack: Some(0),
+            system_status: Some(String::new()),
+            system_type: Some(String::new()),
+            system_rack: Some(String::new()),
             rack_order: Some(String::new()),
-            allocation: Some(0),
-            operating_system: Some(0),
-            server_model_name: String::new(),
+            operating_system: Some(String::new()),
+            warranty_start: Some(String::new()),
+            warranty_end: Some(String::new()),
+            notes: Some(String::new()),
+            server_model: String::new(),
         }
     }
 }
@@ -68,7 +73,7 @@ impl Default for System {
 fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> System {
     match _get_matches.value_of("serial"){
         Some(_value) => { 
-            system.serial = _value.to_string();
+            system.serial = Some(_value.to_string());
         },
         None => { 
             // Possibly check here for error?
@@ -76,7 +81,7 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
     }
     match _get_matches.value_of("asset-tag"){
         Some(_value) => {
-            system.asset_tag = _value.to_string();
+            system.asset_tag = Some(_value.to_string());
         },
         None => {
             // Possibly check here for error?
@@ -116,7 +121,7 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
     }
     match _get_matches.value_of("server-model"){
         Some(_value) => { 
-            system.server_model = _value.parse::<u32>().unwrap();
+            system.server_model= _value.to_string();
         },
         None => { 
             // Possibly check here for error?
@@ -124,15 +129,7 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
     }
     match _get_matches.value_of("system-status"){
         Some(_value) => { 
-            system.system_status = Some(_value.parse::<u32>().unwrap());
-        },
-        None => { 
-            // Possibly check here for error?
-        }
-    }
-    match _get_matches.value_of("allocation"){
-        Some(_value) => { 
-            system.allocation = Some(_value.parse::<u32>().unwrap());
+            system.system_status = Some(_value.to_string());
         },
         None => { 
             // Possibly check here for error?
@@ -140,7 +137,31 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
     }
     match _get_matches.value_of("operating-system"){
         Some(_value) => { 
-            system.operating_system = Some(_value.parse::<u32>().unwrap());
+            system.operating_system = Some(_value.to_string());
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("warranty-start"){
+        Some(_value) => { 
+            system.warranty_start = Some(_value.to_string());
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("warranty-end"){
+        Some(_value) => { 
+            system.warranty_end = Some(_value.to_string());
+        },
+        None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("notes"){
+        Some(_value) => { 
+            system.notes = Some(_value.to_string());
         },
         None => { 
             // Possibly check here for error?
@@ -148,7 +169,7 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
     }
     match _get_matches.value_of("system-type"){
         Some(_value) => { 
-            system.system_type = Some(_value.parse::<u32>().unwrap());
+            system.system_type = Some(_value.to_string());
         },
         None => { 
             // Possibly check here for error?
@@ -156,7 +177,7 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
     }
     match _get_matches.value_of("system-rack"){
         Some(_value) => { 
-            system.system_rack = Some(_value.parse::<u32>().unwrap());
+            system.system_rack = Some(_value.to_string());
         },
         None => { 
             // Possibly check here for error?
@@ -166,14 +187,6 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
         Some(_value) => { 
             // system.rack_order = Some(_value.parse::<f32>().unwrap());
             system.rack_order = Some(_value.to_string());
-        },
-        None => { 
-            // Possibly check here for error?
-        }
-    }
-    match _get_matches.value_of("server-model-name"){
-        Some(_value) => { 
-            system.server_model_name = _value.to_string();
         },
         None => { 
             // Possibly check here for error?
@@ -248,7 +261,7 @@ fn get_system(search: &str, should_return: bool, config: minv_config::Config) ->
                         println!("{}", s)
                     }
                 },
-                Err(_e) => { println!("No Results")}
+                Err(_e) => { println!("No Results: {}", _e)}
             }
         },
         None => { println!("No Results") }
