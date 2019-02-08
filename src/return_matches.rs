@@ -1,5 +1,8 @@
 use clap::{App, Arg, SubCommand, ArgMatches};
+// return_matches returns a clap::ArgMatches
+// https://docs.rs/clap/2.32.0/clap/struct.ArgMatches.html
 pub fn return_matches<'a>() -> ArgMatches<'static> {
+    // create and update for system are all shared, no reason to duplicate them
     let system_shared_args = vec!(
         Arg::with_name("serial")
             .required(false)
@@ -177,6 +180,7 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
                     .required(true)
                     .help("Hostname of System to be updated")
                 )
+                // utilize system_shared_args again here as create and update have the same options
                 .args(&system_shared_args)
             )
             .subcommand(SubCommand::with_name("create")
@@ -185,6 +189,7 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
                     .required(true)
                     .help("Hostname of System to be created")
                 )
+                // utilize system_shared_args again here as create and update have the same options
                 .args(&system_shared_args)
             )
             
