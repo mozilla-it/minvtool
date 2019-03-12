@@ -79,6 +79,16 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
             .long("warranty-end")
             .help("warranty-end YYYY-mm-dd")
             .takes_value(true),
+        Arg::with_name("pdu1")
+            .required(false)
+            .long("pdu1")
+            .help("pdu1")
+            .takes_value(true),
+        Arg::with_name("pdu2")
+            .required(false)
+            .long("pdu2")
+            .help("pdu2")
+            .takes_value(true),
     );
         let matches = App::new("minvtool")
         .about("CLI interface to Mozilla Inventory")
