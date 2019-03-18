@@ -41,6 +41,8 @@ pub struct System {
     pdu1: Option<String>,
     #[serde(default)]
     pdu2: Option<String>,
+    #[serde(default)]
+    append_notes: Option<String>,
 }
 
 impl std::fmt::Display for System {
@@ -72,6 +74,7 @@ impl Default for System {
             server_model: String::new(),
             pdu1: Some(String::new()),
             pdu2: Some(String::new()),
+            append_notes: Some(String::new()),
         }
     }
 }
@@ -209,6 +212,14 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
     match _get_matches.value_of("pdu2"){
         Some(_value) => {
             system.pdu2 = Some(_value.to_string());
+        },
+        None => {
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("append-notes"){
+        Some(_value) => {
+            system.append_notes = Some(_value.to_string());
         },
         None => {
             // Possibly check here for error?

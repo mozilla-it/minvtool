@@ -89,6 +89,11 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
             .long("pdu2")
             .help("pdu2")
             .takes_value(true),
+        Arg::with_name("append-notes")
+            .required(false)
+            .long("append-notes")
+            .help("append-notes")
+            .takes_value(true),
     );
         let matches = App::new("minvtool")
         .about("CLI interface to Mozilla Inventory")
