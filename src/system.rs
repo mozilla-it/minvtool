@@ -37,6 +37,12 @@ pub struct System {
     warranty_start: Option<String>,
     #[serde(default)]
     warranty_end: Option<String>,
+    #[serde(default)]
+    pdu1: Option<String>,
+    #[serde(default)]
+    pdu2: Option<String>,
+    #[serde(default)]
+    append_notes: Option<String>,
 }
 
 impl std::fmt::Display for System {
@@ -66,6 +72,9 @@ impl Default for System {
             warranty_end: Some(String::new()),
             notes: Some(String::new()),
             server_model: String::new(),
+            pdu1: Some(String::new()),
+            pdu2: Some(String::new()),
+            append_notes: Some(String::new()),
         }
     }
 }
@@ -189,6 +198,30 @@ fn system_from_matches(_get_matches: &clap::ArgMatches, mut system: System) -> S
             system.rack_order = Some(_value.to_string());
         },
         None => { 
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("pdu1"){
+        Some(_value) => {
+            system.pdu1 = Some(_value.to_string());
+        },
+        None => {
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("pdu2"){
+        Some(_value) => {
+            system.pdu2 = Some(_value.to_string());
+        },
+        None => {
+            // Possibly check here for error?
+        }
+    }
+    match _get_matches.value_of("append-notes"){
+        Some(_value) => {
+            system.append_notes = Some(_value.to_string());
+        },
+        None => {
             // Possibly check here for error?
         }
     }

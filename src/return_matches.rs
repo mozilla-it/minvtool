@@ -1,5 +1,8 @@
 use clap::{App, Arg, SubCommand, ArgMatches};
+// return_matches returns a clap::ArgMatches
+// https://docs.rs/clap/2.32.0/clap/struct.ArgMatches.html
 pub fn return_matches<'a>() -> ArgMatches<'static> {
+    // create and update for system are all shared, no reason to duplicate them
     let system_shared_args = vec!(
         Arg::with_name("serial")
             .required(false)
@@ -75,6 +78,21 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
             .required(false)
             .long("warranty-end")
             .help("warranty-end YYYY-mm-dd")
+            .takes_value(true),
+        Arg::with_name("pdu1")
+            .required(false)
+            .long("pdu1")
+            .help("pdu1")
+            .takes_value(true),
+        Arg::with_name("pdu2")
+            .required(false)
+            .long("pdu2")
+            .help("pdu2")
+            .takes_value(true),
+        Arg::with_name("append-notes")
+            .required(false)
+            .long("append-notes")
+            .help("append-notes")
             .takes_value(true),
     );
         let matches = App::new("minvtool")
@@ -177,6 +195,7 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
                     .required(true)
                     .help("Hostname of System to be updated")
                 )
+                // utilize system_shared_args again here as create and update have the same options
                 .args(&system_shared_args)
             )
             .subcommand(SubCommand::with_name("create")
@@ -185,6 +204,7 @@ pub fn return_matches<'a>() -> ArgMatches<'static> {
                     .required(true)
                     .help("Hostname of System to be created")
                 )
+                // utilize system_shared_args again here as create and update have the same options
                 .args(&system_shared_args)
             )
             

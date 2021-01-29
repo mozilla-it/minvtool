@@ -163,7 +163,6 @@ impl RESTApi {
                     },
                     StatusCode::BAD_REQUEST => { 
                         let errors: InventoryError = serde_json::from_str(&_resp.text().unwrap()).unwrap();
-
                         for error in errors.non_field_errors {
                             println!("Error: {}", error);
                             exit(2);
